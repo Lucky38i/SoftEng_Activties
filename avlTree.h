@@ -46,8 +46,10 @@ class avlTree {
         avlTree & operator=(const avlTree<K,I> & bst);
         static void rotateRight(Node* & localRoot);
         static void rotateLeft(Node* & localRoot);
+        static bool rebalance(Node* &);
 
 };
+
 
 template<typename K, typename I>
 void avlTree<K, I>::displayEntries() {
@@ -275,6 +277,34 @@ void avlTree<K, I>::rotateLeft(avlTree::Node *&localRoot) {
     b->balanceFactor = tempBalanceB - 1 - std::max(-tempBalanceA, 0);
 
     localRoot = b;
+}
+
+template<typename K, typename I>
+bool avlTree<K, I>::rebalance(avlTree::Node *& localRoot) {
+    assert(!isleaf(localRoot));
+    // A = 2
+    if (localRoot->balanceFactor == 2 ) {
+        // B = 1 or = 0
+        assert(!isLeaf(localRoot->rightChild));
+        if ((localRoot->rightChild->balanceFactor == 1) || (localRoot->rightChild->balanceFactor == 0) )
+            rotateLeft(localRoot);
+        else {
+            rotateRight(localRoot->rightChild);
+            rotateLeft(localRoot);
+        }
+    }
+    // B = -2
+    else if (localRoot->balanceFactor == -2) {
+
+        // A = -1 or  = 0
+        if ((localRoot->leftChild->balanceFactor == -1) || (localRoot->leftChild->balanceFactor == 0))
+            rotateRight(localRoot);
+        else {
+            rotateLeft(localRoot->leftChild);
+            rotateRight(localRoot);
+        }
+    }
+
 }
 
 //std::ostream & operator<<(std::ostream &, const typename avlTree<K, I> &);
