@@ -6,13 +6,13 @@
 #define BOOST_TEST_MODULE activities02_unit_test
 
 #include <boost/test/unit_test.hpp>
-#include "../binarySearchTree.h"
+#include "avlTree.h"
 
 //TODO fix this
 
 BOOST_AUTO_TEST_SUITE(activities02_test)
 
-    binarySearchTree<int, std::string> newTree;
+    avlTree<int, std::string> newTree;
 
     BOOST_AUTO_TEST_CASE(lookup_null) {
         BOOST_CHECK_EQUAL(newTree.lookup(3), nullptr);
@@ -31,9 +31,9 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(actitivites02_copy)
     BOOST_AUTO_TEST_CASE(deep_copy) {
-        binarySearchTree<int, std::string> t1;
+        avlTree<int, std::string> t1;
         t1.insert(2,"Will");
-        binarySearchTree<int, std::string> t2 = t1;
+        avlTree<int, std::string> t2 = t1;
         t1.insert(22,"Mary");
         t2.insert(2, "George");
         BOOST_TEST(*t1.lookup(2) == "Will");

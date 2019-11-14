@@ -2,12 +2,12 @@
 //
 
 #include <iostream>
-#include "binarySearchTree.h"
+#include "avlTree.h"
 #include <fstream>
 
 int main() {
     std::cout << "Hello World!\n";
-    binarySearchTree<int, std::string> newTree;
+    avlTree<int, std::string> newTree;
     newTree.lookup(3);
     newTree.insert(22,"Jane");
     newTree.insert(22,"Mary");
@@ -25,7 +25,7 @@ int main() {
     newTree.insert(23,"Elizabeth");
     newTree.insert(1,"William");
     newTree.insert(26,"Charles");
-    newTree.displayEntries();
+    //newTree.displayEntries();
     newTree.displayTree();
 
 }
