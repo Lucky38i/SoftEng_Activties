@@ -168,6 +168,7 @@ bool avlTree<K, I>::insertRec(Key key, Item &item, avlTree::Node *&currentNode) 
 
     bool heightIncrease = false;
 
+
     // If node exists replace item
     if (key == currentNode->key) {
         currentNode->item = item;
@@ -179,17 +180,24 @@ bool avlTree<K, I>::insertRec(Key key, Item &item, avlTree::Node *&currentNode) 
         // If node is a leaf insert new node replacing leaf node
         if (isLeaf(currentNode->rightChild)) {
 
-            // Increase in depth for left child therefore node BF decreases
-            currentNode->balanceFactor ++;
+            // Increase in depth for right child therefore node BF decreases
             currentNode->rightChild = new Node(key, item);
+            currentNode->balanceFactor ++;
 
-            // If left child doesn't exist
+            // If left child doesn't exist or the depth is higher
             if (isLeaf(currentNode->leftChild)) {
                 heightIncrease = true;
             }
         }
         // Recursively look for existing or leaf node
-        else insertRec(key, item, currentNode->rightChild);
+        else {
+            if (insertRec(key, item, currentNode->rightChild)) {
+                // There has been a height increase therefore auto balance
+                if ( (-2 >=currentNode->balanceFactor ) || (currentNode->balanceFactor >= 2)) {
+                    rebalance(currentNode);
+                }
+            }
+        }
     }
     // Traverse tree to the left
     else {
@@ -197,16 +205,13 @@ bool avlTree<K, I>::insertRec(Key key, Item &item, avlTree::Node *&currentNode) 
         if (isLeaf(currentNode->leftChild)) {
 
             // Increase in depth for left child therefore node BF decreases
-            currentNode->balanceFactor --;
             currentNode->leftChild = new Node(key, item);
-
-
-            if (isLeaf(currentNode->rightChild)){
-                heightIncrease = true;
-            }
+            currentNode->balanceFactor --;
         }
         // Recursively look for existing or leaf node
-        else insertRec(key, item, currentNode->leftChild);
+        else {
+            insertRec(key, item, currentNode->leftChild);
+        }
     }
 
     return heightIncrease;
@@ -285,7 +290,7 @@ void avlTree<K, I>::rotateRight(avlTree::Node *&localRoot) {
     b->leftChild = a->rightChild;
 
     b->balanceFactor = tempBalanceB + 1 + std::max(-a->balanceFactor,0);
-    a->balanceFactor = tempBalanceA + a + std::max(b->balanceFactor,0);
+    a->balanceFactor = tempBalanceA + 1 + std::max(b->balanceFactor,0);
 
     localRoot = a;
 }
@@ -311,14 +316,14 @@ void avlTree<K, I>::rotateLeft(avlTree::Node *&localRoot) {
 
 template<typename K, typename I>
 bool avlTree<K, I>::rebalance(avlTree::Node *& localRoot) {
-    assert(!isleaf(localRoot));
+
     bool depthDecrease = false;
 
     // A = 2
     if (localRoot->balanceFactor == 2 ) {
         // B = 1
         assert(!isLeaf(localRoot->rightChild));
-        if ((localRoot->rightChild->balanceFactor == 1)) {
+        if (localRoot->rightChild->balanceFactor == 1) {
             depthDecrease = true;
             rotateLeft(localRoot);
         }
