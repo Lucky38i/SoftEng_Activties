@@ -6,9 +6,7 @@
 #include <fstream>
 
 int main() {
-    std::cout << "Hello World!\n";
     avlTree<int, std::string> newTree;
-    newTree.lookup(3);
     newTree.insert(22,"Jane");
     newTree.insert(22,"Mary");
     newTree.insert(0,"Harold");
@@ -25,8 +23,8 @@ int main() {
     newTree.insert(23,"Elizabeth");
     newTree.insert(1,"William");
     newTree.insert(26,"Charles");
-    //newTree.displayEntries();
-    newTree.displayTree();
+    newTree.displayEntries();
+    //newTree.displayTree();
 
 }
 

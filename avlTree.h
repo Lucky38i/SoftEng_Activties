@@ -38,7 +38,7 @@ class avlTree {
 
         static bool isLeaf(Node* n );
         static Item* lookupRec(Key key,  Node* currentNode);
-        static void insertRec(Key key, Item & item, Node* & currentNode);
+        static bool insertRec(Key key, Item & item, Node* & currentNode);
         static void displayEntriesRec(Node* givenNode);
         static void displayTreeRec(Node* givenNode, int level);
         static Node* findMin(Node* & node);
@@ -164,22 +164,52 @@ typename avlTree<K,I>::Item *avlTree<K, I>::lookupRec(Key key, avlTree::Node *cu
 }
 
 template<typename K, typename I>
-void avlTree<K, I>::insertRec(Key key, Item &item, avlTree::Node *&currentNode) {
+bool avlTree<K, I>::insertRec(Key key, Item &item, avlTree::Node *&currentNode) {
+
+    bool heightIncrease = false;
+
+    // If node exists replace item
     if (key == currentNode->key) {
         currentNode->item = item;
     }
+
+    // Traverse Tree to the right
     else if (key > currentNode->key) {
+
+        // If node is a leaf insert new node replacing leaf node
         if (isLeaf(currentNode->rightChild)) {
+
+            // Increase in depth for left child therefore node BF decreases
+            currentNode->balanceFactor ++;
             currentNode->rightChild = new Node(key, item);
+
+            // If left child doesn't exist
+            if (isLeaf(currentNode->leftChild)) {
+                heightIncrease = true;
+            }
         }
+        // Recursively look for existing or leaf node
         else insertRec(key, item, currentNode->rightChild);
     }
+    // Traverse tree to the left
     else {
+        // If node is a leaf insert new node replacing leaf node
         if (isLeaf(currentNode->leftChild)) {
+
+            // Increase in depth for left child therefore node BF decreases
+            currentNode->balanceFactor --;
             currentNode->leftChild = new Node(key, item);
+
+
+            if (isLeaf(currentNode->rightChild)){
+                heightIncrease = true;
+            }
         }
+        // Recursively look for existing or leaf node
         else insertRec(key, item, currentNode->leftChild);
     }
+
+    return heightIncrease;
 }
 
 template<typename K, typename I>
@@ -189,7 +219,7 @@ void avlTree<K, I>::displayEntriesRec(avlTree::Node *givenNode) {
         displayEntriesRec(givenNode->leftChild);
 
         //Visit the Node?
-        std::cout << givenNode->key << " " << givenNode->item << std::endl;
+        std::cout << givenNode->key << " " << givenNode->item << " ("<< givenNode->balanceFactor << ")"<<  std::endl;
 
         //Traverse Right
         displayEntriesRec(givenNode->rightChild);
@@ -282,29 +312,55 @@ void avlTree<K, I>::rotateLeft(avlTree::Node *&localRoot) {
 template<typename K, typename I>
 bool avlTree<K, I>::rebalance(avlTree::Node *& localRoot) {
     assert(!isleaf(localRoot));
+    bool depthDecrease = false;
+
     // A = 2
     if (localRoot->balanceFactor == 2 ) {
-        // B = 1 or = 0
+        // B = 1
         assert(!isLeaf(localRoot->rightChild));
-        if ((localRoot->rightChild->balanceFactor == 1) || (localRoot->rightChild->balanceFactor == 0) )
+        if ((localRoot->rightChild->balanceFactor == 1)) {
+            depthDecrease = true;
             rotateLeft(localRoot);
+        }
+
+        // B = 0
+        else if(localRoot->rightChild->balanceFactor == 0){
+            rotateLeft(localRoot);
+        }
+
+        // B/C = -1
         else {
+            depthDecrease = true;
             rotateRight(localRoot->rightChild);
             rotateLeft(localRoot);
         }
     }
+
     // B = -2
     else if (localRoot->balanceFactor == -2) {
 
-        // A = -1 or  = 0
-        if ((localRoot->leftChild->balanceFactor == -1) || (localRoot->leftChild->balanceFactor == 0))
+        assert(!isLeaf(localRoot->leftChild));
+
+        // A = -1
+        if (localRoot->leftChild->balanceFactor == -1) {
+            depthDecrease = true;
             rotateRight(localRoot);
+        }
+
+        // A = 0
+        else if (localRoot->leftChild->balanceFactor == 0){
+            rotateRight(localRoot);
+        }
+
+        // A = 1
         else {
+            depthDecrease = true;
             rotateLeft(localRoot->leftChild);
             rotateRight(localRoot);
         }
     }
 
+    return depthDecrease;
 }
 
 //std::ostream & operator<<(std::ostream &, const typename avlTree<K, I> &);
